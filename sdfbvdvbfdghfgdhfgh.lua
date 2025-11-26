@@ -1,4 +1,3 @@
--- Dragon Farm UI System
 local Players = game:GetService("Players")
 local RunService = game:GetService("RunService")
 local TweenService = game:GetService("TweenService")
@@ -6,297 +5,298 @@ local TweenService = game:GetService("TweenService")
 local LocalPlayer = Players.LocalPlayer
 local PlayerGui = LocalPlayer:WaitForChild("PlayerGui")
 
--- ลบ UI เก่าถ้ามี
 if PlayerGui:FindFirstChild("DragonFarmUI") then
     PlayerGui:FindFirstChild("DragonFarmUI"):Destroy()
 end
 
--- สร้าง ScreenGui
 local screenGui = Instance.new("ScreenGui")
 screenGui.Name = "DragonFarmUI"
 screenGui.ResetOnSpawn = false
 screenGui.ZIndexBehavior = Enum.ZIndexBehavior.Sibling
 screenGui.Parent = PlayerGui
 
--- Background Gradient
 local background = Instance.new("Frame")
 background.Name = "Background"
 background.Size = UDim2.new(1, 0, 1, 0)
-background.Position = UDim2.new(0, 0, 0, 0)
-background.BackgroundColor3 = Color3.fromRGB(15, 15, 25)
+background.BackgroundColor3 = Color3.fromRGB(10, 10, 20)
 background.BorderSizePixel = 0
 background.Parent = screenGui
 background.BackgroundTransparency = 1
 
 local bgGradient = Instance.new("UIGradient")
 bgGradient.Color = ColorSequence.new{
-    ColorSequenceKeypoint.new(0, Color3.fromRGB(255, 255, 255)),
-    ColorSequenceKeypoint.new(1, Color3.fromRGB(255, 255, 255))
+    ColorSequenceKeypoint.new(0, Color3.fromRGB(20, 15, 35)),
+    ColorSequenceKeypoint.new(0.5, Color3.fromRGB(15, 10, 25)),
+    ColorSequenceKeypoint.new(1, Color3.fromRGB(25, 20, 40))
 }
-bgGradient.Transparency = NumberSequence.new{
-    NumberSequenceKeypoint.new(0, 0.8),
-    NumberSequenceKeypoint.new(1, 1)
-}
+bgGradient.Rotation = 45
 bgGradient.Parent = background
 
+local mainContainer = Instance.new("Frame")
+mainContainer.Name = "MainContainer"
+mainContainer.AnchorPoint = Vector2.new(0.5, 0.5)
+mainContainer.Size = UDim2.new(0, 1000, 0, 700)
+mainContainer.Position = UDim2.new(0.5, 0, 0.5, 0)
+mainContainer.BackgroundTransparency = 1
+mainContainer.Parent = screenGui
 
--- Timer Container
-local timerContainer = Instance.new("Frame")
-timerContainer.Name = "TimerContainer"
-timerContainer.Size = UDim2.new(0, 600, 0, 120)
-timerContainer.Position = UDim2.new(0.5, -300, 0, 40)
-timerContainer.BackgroundColor3 = Color3.fromRGB(25, 25, 40)
-timerContainer.BorderSizePixel = 0
-timerContainer.Parent = screenGui
+local scale = Instance.new("UIScale")
+scale.Parent = mainContainer
 
-local timerCorner = Instance.new("UICorner")
-timerCorner.CornerRadius = UDim.new(0, 20)
-timerCorner.Parent = timerContainer
+local function updateScale()
+    local screenSize = background.AbsoluteSize
+    local scaleX = screenSize.X / 1920
+    local scaleY = screenSize.Y / 1080
+    scale.Scale = math.min(scaleX, scaleY, 1.2)
+end
 
-local timerStroke = Instance.new("UIStroke")
-timerStroke.Color = Color3.fromRGB(100, 80, 255)
-timerStroke.Thickness = 3
-timerStroke.Parent = timerContainer
+updateScale()
+screenGui:GetPropertyChangedSignal("AbsoluteSize"):Connect(updateScale)
 
--- Timer Label
+local headerFrame = Instance.new("Frame")
+headerFrame.Name = "Header"
+headerFrame.Size = UDim2.new(1, 0, 0, 100)
+headerFrame.BackgroundColor3 = Color3.fromRGB(35, 25, 55)
+headerFrame.BorderSizePixel = 0
+headerFrame.Parent = mainContainer
+
+local headerCorner = Instance.new("UICorner")
+headerCorner.CornerRadius = UDim.new(0, 20)
+headerCorner.Parent = headerFrame
+
+local headerStroke = Instance.new("UIStroke")
+headerStroke.Color = Color3.fromRGB(120, 80, 200)
+headerStroke.Thickness = 3
+headerStroke.Transparency = 0.3
+headerStroke.Parent = headerFrame
+
+local headerGlow = Instance.new("UIGradient")
+headerGlow.Color = ColorSequence.new{
+    ColorSequenceKeypoint.new(0, Color3.fromRGB(80, 50, 150)),
+    ColorSequenceKeypoint.new(0.5, Color3.fromRGB(100, 70, 180)),
+    ColorSequenceKeypoint.new(1, Color3.fromRGB(80, 50, 150))
+}
+headerGlow.Rotation = 90
+headerGlow.Parent = headerFrame
+
+local titleLabel = Instance.new("TextLabel")
+titleLabel.Size = UDim2.new(0.6, 0, 1, 0)
+titleLabel.Position = UDim2.new(0, 20, 0, 0)
+titleLabel.BackgroundTransparency = 1
+titleLabel.Font = Enum.Font.GothamBold
+titleLabel.TextSize = 42
+titleLabel.TextColor3 = Color3.fromRGB(255, 255, 255)
+titleLabel.Text = "🐉 DRAGON FARM PRO"
+titleLabel.TextXAlignment = Enum.TextXAlignment.Left
+titleLabel.Parent = headerFrame
+
 local timerLabel = Instance.new("TextLabel")
 timerLabel.Name = "Timer"
-timerLabel.Size = UDim2.new(1, 0, 1, 0)
+timerLabel.Size = UDim2.new(0.35, 0, 1, 0)
+timerLabel.Position = UDim2.new(0.65, -10, 0, 0)
 timerLabel.BackgroundTransparency = 1
 timerLabel.Font = Enum.Font.GothamBold
-timerLabel.TextSize = 80
-timerLabel.TextColor3 = Color3.fromRGB(100, 255, 100)
-timerLabel.Text = "00:00:00"
-timerLabel.Parent = timerContainer
+timerLabel.TextSize = 36
+timerLabel.TextColor3 = Color3.fromRGB(100, 255, 150)
+timerLabel.Text = "⏱️ 00:00:00"
+timerLabel.TextXAlignment = Enum.TextXAlignment.Right
+timerLabel.Parent = headerFrame
 
--- Stats Container
+local exitButton = Instance.new("TextButton")
+exitButton.Name = "ExitButton"
+exitButton.AnchorPoint = Vector2.new(1, 0)
+exitButton.Size = UDim2.new(0, 80, 0, 80)
+exitButton.Position = UDim2.new(1, -10, 0, -150)
+exitButton.BackgroundColor3 = Color3.fromRGB(200, 50, 50)
+exitButton.BorderSizePixel = 0
+exitButton.Font = Enum.Font.GothamBold
+exitButton.TextSize = 40
+exitButton.TextColor3 = Color3.fromRGB(255, 255, 255)
+exitButton.Text = "X"
+exitButton.AutoButtonColor = false
+exitButton.Parent = headerFrame
+
+local exitCorner = Instance.new("UICorner")
+exitCorner.CornerRadius = UDim.new(0, 15)
+exitCorner.Parent = exitButton
+
+local exitStroke = Instance.new("UIStroke")
+exitStroke.Color = Color3.fromRGB(255, 100, 100)
+exitStroke.Thickness = 2
+exitStroke.Parent = exitButton
+
+exitButton.MouseButton1Click:Connect(function()
+    local tweenInfo = TweenInfo.new(0.1, Enum.EasingStyle.Quad, Enum.EasingDirection.Out)
+    local scaleDown = TweenService:Create(exitButton, tweenInfo, {Size = UDim2.new(0, 70, 0, 70)})
+    scaleDown:Play()
+    scaleDown.Completed:Wait()
+    
+    local scaleUp = TweenService:Create(exitButton, tweenInfo, {Size = UDim2.new(0, 80, 0, 80)})
+    scaleUp:Play()
+    
+    exitButton.BackgroundColor3 = Color3.fromRGB(255, 0, 0)
+    exitButton.Text = "⚠️"
+    task.wait(0.3)
+    
+    game:Shutdown()
+end)
+
+exitButton.MouseEnter:Connect(function()
+    local tween = TweenService:Create(exitButton, TweenInfo.new(0.2), {
+        BackgroundColor3 = Color3.fromRGB(255, 70, 70),
+        Size = UDim2.new(0, 85, 0, 85)
+    })
+    tween:Play()
+end)
+
+exitButton.MouseLeave:Connect(function()
+    local tween = TweenService:Create(exitButton, TweenInfo.new(0.2), {
+        BackgroundColor3 = Color3.fromRGB(200, 50, 50),
+        Size = UDim2.new(0, 80, 0, 80)
+    })
+    tween:Play()
+end)
+
 local statsContainer = Instance.new("Frame")
 statsContainer.Name = "StatsContainer"
-statsContainer.Size = UDim2.new(0, 900, 0, 400)
-statsContainer.Position = UDim2.new(0.5, -450, 0.5, -150)
+statsContainer.Size = UDim2.new(1, 0, 0, 380)
+statsContainer.Position = UDim2.new(0, 0, 0, 120)
 statsContainer.BackgroundTransparency = 1
-statsContainer.Parent = screenGui
+statsContainer.Parent = mainContainer
 
--- Bacon Card
-local baconCard = Instance.new("Frame")
-baconCard.Name = "BaconCard"
-baconCard.Size = UDim2.new(0, 400, 0, 150)
-baconCard.Position = UDim2.new(0, 0, 0, 0)
-baconCard.BackgroundColor3 = Color3.fromRGB(150, 80, 60)
-baconCard.BorderSizePixel = 0
-baconCard.Parent = statsContainer
+local statsLayout = Instance.new("UIListLayout")
+statsLayout.Padding = UDim.new(0, 15)
+statsLayout.SortOrder = Enum.SortOrder.LayoutOrder
+statsLayout.Parent = statsContainer
 
-local baconCorner = Instance.new("UICorner")
-baconCorner.CornerRadius = UDim.new(0, 25)
-baconCorner.Parent = baconCard
+local function createStatCard(name, icon, color1, color2, order)
+    local card = Instance.new("Frame")
+    card.Name = name .. "Card"
+    card.Size = UDim2.new(1, 0, 0, 115)
+    card.BackgroundColor3 = color1
+    card.BorderSizePixel = 0
+    card.LayoutOrder = order
+    card.Parent = statsContainer
+    
+    local corner = Instance.new("UICorner")
+    corner.CornerRadius = UDim.new(0, 18)
+    corner.Parent = card
+    
+    local gradient = Instance.new("UIGradient")
+    gradient.Color = ColorSequence.new{
+        ColorSequenceKeypoint.new(0, color1),
+        ColorSequenceKeypoint.new(1, color2)
+    }
+    gradient.Rotation = 135
+    gradient.Parent = card
+    
+    local stroke = Instance.new("UIStroke")
+    stroke.Color = Color3.new(1, 1, 1)
+    stroke.Thickness = 3
+    stroke.Transparency = 0.7
+    stroke.Parent = card
+    
+    local iconLabel = Instance.new("TextLabel")
+    iconLabel.Size = UDim2.new(0, 90, 0, 90)
+    iconLabel.Position = UDim2.new(0, 15, 0.5, -45)
+    iconLabel.BackgroundTransparency = 1
+    iconLabel.Font = Enum.Font.GothamBold
+    iconLabel.TextSize = 65
+    iconLabel.Text = icon
+    iconLabel.Parent = card
+    
+    local titleLabel = Instance.new("TextLabel")
+    titleLabel.Size = UDim2.new(0, 400, 0, 40)
+    titleLabel.Position = UDim2.new(0, 120, 0, 15)
+    titleLabel.BackgroundTransparency = 1
+    titleLabel.Font = Enum.Font.GothamBold
+    titleLabel.TextSize = 28
+    titleLabel.TextColor3 = Color3.fromRGB(255, 255, 255)
+    titleLabel.Text = name
+    titleLabel.TextXAlignment = Enum.TextXAlignment.Left
+    titleLabel.Parent = card
+    
+    local valueLabel = Instance.new("TextLabel")
+    valueLabel.Name = "Value"
+    valueLabel.Size = UDim2.new(0, 850, 0, 60)
+    valueLabel.Position = UDim2.new(0, 120, 0, 50)
+    valueLabel.BackgroundTransparency = 1
+    valueLabel.Font = Enum.Font.GothamBold
+    valueLabel.TextSize = 45
+    valueLabel.TextColor3 = Color3.fromRGB(255, 255, 200)
+    valueLabel.Text = "0"
+    valueLabel.TextXAlignment = Enum.TextXAlignment.Left
+    valueLabel.Parent = card
+    
+    spawn(function()
+        while card.Parent do
+            local pulse = TweenService:Create(stroke, TweenInfo.new(2, Enum.EasingStyle.Sine, Enum.EasingDirection.InOut, -1, true), {
+                Transparency = 0.4
+            })
+            pulse:Play()
+            task.wait(120)
+        end
+    end)
+    
+    return card
+end
 
-local baconGradient = Instance.new("UIGradient")
-baconGradient.Color = ColorSequence.new{
-    ColorSequenceKeypoint.new(0, Color3.fromRGB(180, 100, 80)),
-    ColorSequenceKeypoint.new(1, Color3.fromRGB(140, 70, 50))
-}
-baconGradient.Rotation = 90
-baconGradient.Parent = baconCard
+local baconCard = createStatCard("Bacon", "🥓", Color3.fromRGB(160, 90, 70), Color3.fromRGB(120, 60, 45), 1)
+local meatCard = createStatCard("Meat", "🥩", Color3.fromRGB(190, 80, 100), Color3.fromRGB(140, 50, 70), 2)
+local coinsCard = createStatCard("Coins", "💰", Color3.fromRGB(230, 180, 60), Color3.fromRGB(180, 140, 40), 3)
 
-local baconStroke = Instance.new("UIStroke")
-baconStroke.Color = Color3.fromRGB(255, 150, 120)
-baconStroke.Thickness = 4
-baconStroke.Parent = baconCard
-
--- Bacon Icon
-local baconIcon = Instance.new("TextLabel")
-baconIcon.Size = UDim2.new(0, 80, 0, 80)
-baconIcon.Position = UDim2.new(0, 20, 0.5, -40)
-baconIcon.BackgroundTransparency = 1
-baconIcon.Font = Enum.Font.GothamBold
-baconIcon.TextSize = 60
-baconIcon.Text = "🥓"
-baconIcon.Parent = baconCard
-
--- Bacon Title
-local baconTitle = Instance.new("TextLabel")
-baconTitle.Size = UDim2.new(0, 280, 0, 50)
-baconTitle.Position = UDim2.new(0, 110, 0, 20)
-baconTitle.BackgroundTransparency = 1
-baconTitle.Font = Enum.Font.GothamBold
-baconTitle.TextSize = 32
-baconTitle.TextColor3 = Color3.fromRGB(255, 255, 255)
-baconTitle.Text = "Bacon"
-baconTitle.TextXAlignment = Enum.TextXAlignment.Left
-baconTitle.Parent = baconCard
-
--- Bacon Value
-local baconValue = Instance.new("TextLabel")
-baconValue.Name = "Value"
-baconValue.Size = UDim2.new(0, 280, 0, 70)
-baconValue.Position = UDim2.new(0, 110, 0, 65)
-baconValue.BackgroundTransparency = 1
-baconValue.Font = Enum.Font.GothamBold
-baconValue.TextSize = 48
-baconValue.TextColor3 = Color3.fromRGB(255, 255, 150)
-baconValue.Text = "0"
-baconValue.TextXAlignment = Enum.TextXAlignment.Left
-baconValue.Parent = baconCard
-
--- Meat Card
-local meatCard = Instance.new("Frame")
-meatCard.Name = "MeatCard"
-meatCard.Size = UDim2.new(0, 400, 0, 150)
-meatCard.Position = UDim2.new(0, 500, 0, 0)
-meatCard.BackgroundColor3 = Color3.fromRGB(180, 70, 90)
-meatCard.BorderSizePixel = 0
-meatCard.Parent = statsContainer
-
-local meatCorner = Instance.new("UICorner")
-meatCorner.CornerRadius = UDim.new(0, 25)
-meatCorner.Parent = meatCard
-
-local meatGradient = Instance.new("UIGradient")
-meatGradient.Color = ColorSequence.new{
-    ColorSequenceKeypoint.new(0, Color3.fromRGB(200, 80, 100)),
-    ColorSequenceKeypoint.new(1, Color3.fromRGB(160, 60, 80))
-}
-meatGradient.Rotation = 90
-meatGradient.Parent = meatCard
-
-local meatStroke = Instance.new("UIStroke")
-meatStroke.Color = Color3.fromRGB(255, 120, 140)
-meatStroke.Thickness = 4
-meatStroke.Parent = meatCard
-
--- Meat Icon
-local meatIcon = Instance.new("TextLabel")
-meatIcon.Size = UDim2.new(0, 80, 0, 80)
-meatIcon.Position = UDim2.new(0, 20, 0.5, -40)
-meatIcon.BackgroundTransparency = 1
-meatIcon.Font = Enum.Font.GothamBold
-meatIcon.TextSize = 60
-meatIcon.Text = "🥩"
-meatIcon.Parent = meatCard
-
--- Meat Title
-local meatTitle = Instance.new("TextLabel")
-meatTitle.Size = UDim2.new(0, 280, 0, 50)
-meatTitle.Position = UDim2.new(0, 110, 0, 20)
-meatTitle.BackgroundTransparency = 1
-meatTitle.Font = Enum.Font.GothamBold
-meatTitle.TextSize = 32
-meatTitle.TextColor3 = Color3.fromRGB(255, 255, 255)
-meatTitle.Text = "Meat"
-meatTitle.TextXAlignment = Enum.TextXAlignment.Left
-meatTitle.Parent = meatCard
-
--- Meat Value
-local meatValue = Instance.new("TextLabel")
-meatValue.Name = "Value"
-meatValue.Size = UDim2.new(0, 280, 0, 70)
-meatValue.Position = UDim2.new(0, 110, 0, 65)
-meatValue.BackgroundTransparency = 1
-meatValue.Font = Enum.Font.GothamBold
-meatValue.TextSize = 48
-meatValue.TextColor3 = Color3.fromRGB(255, 255, 150)
-meatValue.Text = "0"
-meatValue.TextXAlignment = Enum.TextXAlignment.Left
-meatValue.Parent = meatCard
-
--- Coins Card
-local coinsCard = Instance.new("Frame")
-coinsCard.Name = "CoinsCard"
-coinsCard.Size = UDim2.new(0, 900, 0, 200)
-coinsCard.Position = UDim2.new(0, 0, 0, 200)
-coinsCard.BackgroundColor3 = Color3.fromRGB(220, 180, 50)
-coinsCard.BorderSizePixel = 0
-coinsCard.Parent = statsContainer
-
-local coinsCorner = Instance.new("UICorner")
-coinsCorner.CornerRadius = UDim.new(0, 30)
-coinsCorner.Parent = coinsCard
-
-local coinsGradient = Instance.new("UIGradient")
-coinsGradient.Color = ColorSequence.new{
-    ColorSequenceKeypoint.new(0, Color3.fromRGB(255, 220, 100)),
-    ColorSequenceKeypoint.new(0.5, Color3.fromRGB(230, 190, 70)),
-    ColorSequenceKeypoint.new(1, Color3.fromRGB(200, 160, 50))
-}
-coinsGradient.Rotation = 90
-coinsGradient.Parent = coinsCard
-
-local coinsStroke = Instance.new("UIStroke")
-coinsStroke.Color = Color3.fromRGB(255, 240, 150)
-coinsStroke.Thickness = 5
-coinsStroke.Parent = coinsCard
-
--- Coins Icon
-local coinsIcon = Instance.new("TextLabel")
-coinsIcon.Size = UDim2.new(0, 120, 0, 120)
-coinsIcon.Position = UDim2.new(0, 30, 0.5, -60)
-coinsIcon.BackgroundTransparency = 1
-coinsIcon.Font = Enum.Font.GothamBold
-coinsIcon.TextSize = 90
-coinsIcon.Text = "💰"
-coinsIcon.Parent = coinsCard
-
--- Coins Title
-local coinsTitle = Instance.new("TextLabel")
-coinsTitle.Size = UDim2.new(0, 720, 0, 60)
-coinsTitle.Position = UDim2.new(0, 160, 0, 30)
-coinsTitle.BackgroundTransparency = 1
-coinsTitle.Font = Enum.Font.GothamBold
-coinsTitle.TextSize = 40
-coinsTitle.TextColor3 = Color3.fromRGB(80, 50, 20)
-coinsTitle.Text = "Coins"
-coinsTitle.TextXAlignment = Enum.TextXAlignment.Left
-coinsTitle.Parent = coinsCard
-
--- Coins Value
-local coinsValue = Instance.new("TextLabel")
-coinsValue.Name = "Value"
-coinsValue.Size = UDim2.new(0, 720, 0, 100)
-coinsValue.Position = UDim2.new(0, 160, 0, 85)
-coinsValue.BackgroundTransparency = 1
-coinsValue.Font = Enum.Font.GothamBold
-coinsValue.TextSize = 70
-coinsValue.TextColor3 = Color3.fromRGB(255, 255, 255)
-coinsValue.Text = "0"
-coinsValue.TextXAlignment = Enum.TextXAlignment.Left
-coinsValue.Parent = coinsCard
-
--- Log Container (Bottom)
 local logContainer = Instance.new("Frame")
 logContainer.Name = "LogContainer"
-logContainer.Size = UDim2.new(0, 900, 0, 150)
-logContainer.Position = UDim2.new(0.5, -450, 1, -170)
-logContainer.BackgroundColor3 = Color3.fromRGB(20, 20, 35)
+logContainer.Size = UDim2.new(1, 0, 0, 160)
+logContainer.Position = UDim2.new(0, 0, 0, 520)
+logContainer.BackgroundColor3 = Color3.fromRGB(25, 20, 40)
 logContainer.BorderSizePixel = 0
-logContainer.BackgroundTransparency = 0.3
-logContainer.Parent = screenGui
+logContainer.Parent = mainContainer
 
 local logCorner = Instance.new("UICorner")
-logCorner.CornerRadius = UDim.new(0, 20)
+logCorner.CornerRadius = UDim.new(0, 18)
 logCorner.Parent = logContainer
 
 local logStroke = Instance.new("UIStroke")
-logStroke.Color = Color3.fromRGB(80, 80, 120)
+logStroke.Color = Color3.fromRGB(100, 80, 180)
 logStroke.Thickness = 2
+logStroke.Transparency = 0.5
 logStroke.Parent = logContainer
 
--- Log Text
+local logGradient = Instance.new("UIGradient")
+logGradient.Color = ColorSequence.new{
+    ColorSequenceKeypoint.new(0, Color3.fromRGB(30, 25, 50)),
+    ColorSequenceKeypoint.new(1, Color3.fromRGB(20, 15, 35))
+}
+logGradient.Rotation = 90
+logGradient.Parent = logContainer
+
+local logTitle = Instance.new("TextLabel")
+logTitle.Size = UDim2.new(1, -30, 0, 35)
+logTitle.Position = UDim2.new(0, 15, 0, 10)
+logTitle.BackgroundTransparency = 1
+logTitle.Font = Enum.Font.GothamBold
+logTitle.TextSize = 22
+logTitle.TextColor3 = Color3.fromRGB(150, 150, 200)
+logTitle.Text = "📋 FARM STATUS"
+logTitle.TextXAlignment = Enum.TextXAlignment.Left
+logTitle.Parent = logContainer
+
 local logText = Instance.new("TextLabel")
 logText.Name = "LogText"
-logText.Size = UDim2.new(1, -40, 1, -40)
-logText.Position = UDim2.new(0, 20, 0, 20)
+logText.Size = UDim2.new(1, -30, 1, -55)
+logText.Position = UDim2.new(0, 15, 0, 45)
 logText.BackgroundTransparency = 1
 logText.Font = Enum.Font.GothamMedium
-logText.TextSize = 22
-logText.TextColor3 = Color3.fromRGB(200, 200, 255)
+logText.TextSize = 20
+logText.TextColor3 = Color3.fromRGB(200, 255, 200)
 logText.Text = "🐉 Waiting for farm to start..."
 logText.TextWrapped = true
 logText.TextXAlignment = Enum.TextXAlignment.Left
 logText.TextYAlignment = Enum.TextYAlignment.Top
 logText.Parent = logContainer
 
--- Format number with commas
-local function formatNumber(num)
+local formatNumber = function(num)
     local formatted = tostring(num)
     while true do
         formatted, k = string.gsub(formatted, "^(-?%d+)(%d%d%d)", '%1,%2')
@@ -305,46 +305,36 @@ local function formatNumber(num)
     return formatted
 end
 
--- Update Stats
 local startTime = tick()
 local function updateStats()
     pcall(function()
-        -- Timer
         local elapsed = tick() - startTime
         local hours = math.floor(elapsed / 3600)
         local minutes = math.floor((elapsed % 3600) / 60)
         local seconds = math.floor(elapsed % 60)
-        timerLabel.Text = string.format("%02d:%02d:%02d", hours, minutes, seconds)
+        timerLabel.Text = string.format("⏱️ %02d:%02d:%02d", hours, minutes, seconds)
         
-        -- Bacon
         local bacon = LocalPlayer.Data.Resources.Bacon.Value
-        baconValue.Text = formatNumber(bacon)
+        baconCard.Value.Text = formatNumber(bacon)
         
-        -- Meat
         local meat = LocalPlayer.Data.Resources.Meat.Value
-        meatValue.Text = formatNumber(meat)
+        meatCard.Value.Text = formatNumber(meat)
         
-        -- Coins
         local coins = LocalPlayer.Data.Currency.Coins.Value
-        coinsValue.Text = formatNumber(coins)
+        coinsCard.Value.Text = formatNumber(coins)
     end)
 end
 
--- Animation Loop for glow effect
 spawn(function()
     while screenGui.Parent do
-        -- Animate timer stroke
-        local tweenInfo = TweenInfo.new(1, Enum.EasingStyle.Sine, Enum.EasingDirection.InOut, -1, true)
-        local tween = TweenService:Create(timerStroke, tweenInfo, {
-            Color = Color3.fromRGB(150, 100, 255)
+        local glow = TweenService:Create(headerStroke, TweenInfo.new(3, Enum.EasingStyle.Sine, Enum.EasingDirection.InOut, -1, true), {
+            Color = Color3.fromRGB(180, 120, 255)
         })
-        tween:Play()
-        
-        task.wait(60)
+        glow:Play()
+        task.wait(180)
     end
 end)
 
--- Update Loop
 spawn(function()
     while screenGui.Parent do
         updateStats()
@@ -352,14 +342,12 @@ spawn(function()
     end
 end)
 
--- Log Function (สำหรับใช้จาก script อื่น)
 getgenv().UpdateFarmLog = function(message)
     pcall(function()
         logText.Text = message
     end)
 end
 
--- Export UI elements
 return {
     ScreenGui = screenGui,
     UpdateLog = getgenv().UpdateFarmLog,
