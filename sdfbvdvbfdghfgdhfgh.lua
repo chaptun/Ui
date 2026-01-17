@@ -1,15 +1,12 @@
--- Dragon Farm Status UI สำหรับ Roblox (Enhanced Version)
 local Players = game:GetService("Players")
 local TweenService = game:GetService("TweenService")
 local LocalPlayer = Players.LocalPlayer
 local PlayerGui = LocalPlayer:WaitForChild("PlayerGui")
 
--- ลบ UI เก่าถ้ามี
 if PlayerGui:FindFirstChild("DragonFarmUI") then
     PlayerGui:FindFirstChild("DragonFarmUI"):Destroy()
 end
 
--- สร้าง ScreenGui หลัก
 local ScreenGui = Instance.new("ScreenGui")
 ScreenGui.Name = "DragonFarmUI"
 ScreenGui.ResetOnSpawn = false
@@ -17,11 +14,10 @@ ScreenGui.ZIndexBehavior = Enum.ZIndexBehavior.Sibling
 ScreenGui.DisplayOrder = 999999999
 ScreenGui.Parent = PlayerGui
 
--- Main Container (ตรงกลางจอ - ขนาดใหญ่ขึ้น)
 local MainFrame = Instance.new("Frame")
 MainFrame.Name = "MainFrame"
 MainFrame.AnchorPoint = Vector2.new(0.5, 0.5)
-MainFrame.Size = UDim2.new(0, 750, 0, 700)
+MainFrame.Size = UDim2.new(0, 750, 0, 780)
 MainFrame.Position = UDim2.new(0.5, 0, 0.5, 0)
 MainFrame.BackgroundColor3 = Color3.fromRGB(15, 15, 25)
 MainFrame.BackgroundTransparency = 0.2
@@ -29,12 +25,10 @@ MainFrame.BorderSizePixel = 0
 MainFrame.ZIndex = 999999999
 MainFrame.Parent = ScreenGui
 
--- เพิ่ม UICorner
 local mainCorner = Instance.new("UICorner")
 mainCorner.CornerRadius = UDim.new(0, 25)
 mainCorner.Parent = MainFrame
 
--- เพิ่ม UIScale สำหรับรองรับหน้าจอทุกขนาด
 local uiScale = Instance.new("UIScale")
 uiScale.Parent = MainFrame
 
@@ -42,13 +36,12 @@ local function updateScale()
     local screenSize = ScreenGui.AbsoluteSize
     local scaleX = screenSize.X / 1920
     local scaleY = screenSize.Y / 1080
-    uiScale.Scale = math.max(math.min(scaleX, scaleY, 1.5), 0.8)
+    uiScale.Scale = math.max(math.min(scaleX, scaleY, 1.5), 0.7)
 end
 
 updateScale()
 ScreenGui:GetPropertyChangedSignal("AbsoluteSize"):Connect(updateScale)
 
--- เพิ่ม Border Gradient
 local borderFrame = Instance.new("Frame")
 borderFrame.Name = "Border"
 borderFrame.Size = UDim2.new(1, 6, 1, 6)
@@ -71,7 +64,6 @@ borderGradient.Color = ColorSequence.new{
 borderGradient.Rotation = 45
 borderGradient.Parent = borderFrame
 
--- Animate Border Gradient
 spawn(function()
     while MainFrame.Parent do
         for i = 0, 360, 2 do
@@ -82,7 +74,6 @@ spawn(function()
     end
 end)
 
--- Header
 local Header = Instance.new("Frame")
 Header.Name = "Header"
 Header.Size = UDim2.new(1, 0, 0, 100)
@@ -103,7 +94,6 @@ headerGradient.Color = ColorSequence.new{
 headerGradient.Rotation = 90
 headerGradient.Parent = Header
 
--- Title
 local Title = Instance.new("TextLabel")
 Title.Name = "Title"
 Title.Size = UDim2.new(1, -40, 0, 45)
@@ -116,7 +106,6 @@ Title.Font = Enum.Font.GothamBold
 Title.TextXAlignment = Enum.TextXAlignment.Left
 Title.Parent = Header
 
--- Player Name Display
 local PlayerNameLabel = Instance.new("TextLabel")
 PlayerNameLabel.Name = "PlayerName"
 PlayerNameLabel.Size = UDim2.new(1, -40, 0, 30)
@@ -129,7 +118,6 @@ PlayerNameLabel.Font = Enum.Font.GothamBold
 PlayerNameLabel.TextXAlignment = Enum.TextXAlignment.Left
 PlayerNameLabel.Parent = Header
 
--- Status Indicator (มุมขวาบน)
 local StatusDot = Instance.new("Frame")
 StatusDot.Name = "StatusDot"
 StatusDot.Size = UDim2.new(0, 16, 0, 16)
@@ -142,7 +130,6 @@ local dotCorner = Instance.new("UICorner")
 dotCorner.CornerRadius = UDim.new(1, 0)
 dotCorner.Parent = StatusDot
 
--- Animate Status Dot
 spawn(function()
     while StatusDot.Parent do
         TweenService:Create(StatusDot, TweenInfo.new(0.8, Enum.EasingStyle.Sine, Enum.EasingDirection.InOut, -1, true), {
@@ -162,7 +149,6 @@ StatusText.TextSize = 16
 StatusText.Font = Enum.Font.GothamBold
 StatusText.Parent = Header
 
--- Farm Mode Indicator (ใหม่)
 local ModePanel = Instance.new("Frame")
 ModePanel.Name = "ModePanel"
 ModePanel.Size = UDim2.new(1, -40, 0, 60)
@@ -227,20 +213,18 @@ AntiDetectStatus.Font = Enum.Font.GothamBold
 AntiDetectStatus.TextXAlignment = Enum.TextXAlignment.Right
 AntiDetectStatus.Parent = ModePanel
 
--- Stats Container
 local StatsContainer = Instance.new("Frame")
 StatsContainer.Name = "StatsContainer"
-StatsContainer.Size = UDim2.new(1, -40, 0, 350)
+StatsContainer.Size = UDim2.new(1, -40, 0, 440)
 StatsContainer.Position = UDim2.new(0, 20, 0, 200)
 StatsContainer.BackgroundTransparency = 1
 StatsContainer.Parent = MainFrame
 
 local statsLayout = Instance.new("UIListLayout")
-statsLayout.Padding = UDim.new(0, 15)
+statsLayout.Padding = UDim.new(0, 10)
 statsLayout.SortOrder = Enum.SortOrder.LayoutOrder
 statsLayout.Parent = StatsContainer
 
--- ฟังก์ชันฟอร์แมตตัวเลข
 local function formatNumber(num)
     local formatted = tostring(math.floor(num))
     while true do
@@ -250,7 +234,6 @@ local function formatNumber(num)
     return formatted
 end
 
--- ฟังก์ชันสร้าง Stat Card แบบใหม่ (แสดงข้อมูลเพิ่ม)
 local function CreateStatCard(name, icon, color1, color2, layoutOrder)
     local card = Instance.new("Frame")
     card.Name = name .. "Card"
@@ -279,7 +262,6 @@ local function CreateStatCard(name, icon, color1, color2, layoutOrder)
     cardStroke.Transparency = 0.7
     cardStroke.Parent = card
     
-    -- Icon
     local iconLabel = Instance.new("TextLabel")
     iconLabel.Name = "Icon"
     iconLabel.Size = UDim2.new(0, 70, 0, 70)
@@ -290,7 +272,6 @@ local function CreateStatCard(name, icon, color1, color2, layoutOrder)
     iconLabel.Font = Enum.Font.GothamBold
     iconLabel.Parent = card
     
-    -- Name Label
     local nameLabel = Instance.new("TextLabel")
     nameLabel.Name = "NameLabel"
     nameLabel.Size = UDim2.new(0, 200, 0, 25)
@@ -303,7 +284,6 @@ local function CreateStatCard(name, icon, color1, color2, layoutOrder)
     nameLabel.TextXAlignment = Enum.TextXAlignment.Left
     nameLabel.Parent = card
     
-    -- Value Label
     local valueLabel = Instance.new("TextLabel")
     valueLabel.Name = "Value"
     valueLabel.Size = UDim2.new(1, -350, 0, 45)
@@ -316,20 +296,18 @@ local function CreateStatCard(name, icon, color1, color2, layoutOrder)
     valueLabel.TextXAlignment = Enum.TextXAlignment.Left
     valueLabel.Parent = card
     
-    -- Rate Label (เพิ่ม/ชม)
     local rateLabel = Instance.new("TextLabel")
     rateLabel.Name = "RateLabel"
     rateLabel.Size = UDim2.new(0, 200, 0, 22)
     rateLabel.Position = UDim2.new(1, -210, 0, 20)
     rateLabel.BackgroundTransparency = 1
-    rateLabel.Text = "📈 +0/hr"
+    rateLabel.Text = "📈 Calculating..."
     rateLabel.TextColor3 = Color3.fromRGB(100, 255, 150)
     rateLabel.TextSize = 16
     rateLabel.Font = Enum.Font.GothamBold
     rateLabel.TextXAlignment = Enum.TextXAlignment.Right
     rateLabel.Parent = card
     
-    -- Target Progress (สำหรับโหมด Hybrid)
     local progressLabel = Instance.new("TextLabel")
     progressLabel.Name = "ProgressLabel"
     progressLabel.Size = UDim2.new(0, 200, 0, 20)
@@ -342,7 +320,6 @@ local function CreateStatCard(name, icon, color1, color2, layoutOrder)
     progressLabel.TextXAlignment = Enum.TextXAlignment.Right
     progressLabel.Parent = card
     
-    -- Hover Effect
     card.MouseEnter:Connect(function()
         TweenService:Create(card, TweenInfo.new(0.2), {BackgroundTransparency = 0.1}):Play()
         TweenService:Create(cardStroke, TweenInfo.new(0.2), {Transparency = 0.4}):Play()
@@ -356,16 +333,15 @@ local function CreateStatCard(name, icon, color1, color2, layoutOrder)
     return card
 end
 
--- สร้าง Stat Cards
-local BaconCard = CreateStatCard("Bacon", "🥓", Color3.fromRGB(160, 90, 70), Color3.fromRGB(120, 60, 45), 1)
-local MeatCard = CreateStatCard("Meat", "🥩", Color3.fromRGB(190, 80, 100), Color3.fromRGB(140, 50, 70), 2)
-local CoinsCard = CreateStatCard("Coins", "💰", Color3.fromRGB(230, 180, 60), Color3.fromRGB(180, 140, 40), 3)
+local FruitCard = CreateStatCard("Fruit", "🍎", Color3.fromRGB(220, 80, 80), Color3.fromRGB(180, 50, 50), 1)
+local BaconCard = CreateStatCard("Bacon", "🥓", Color3.fromRGB(160, 90, 70), Color3.fromRGB(120, 60, 45), 2)
+local MeatCard = CreateStatCard("Meat", "🥩", Color3.fromRGB(190, 80, 100), Color3.fromRGB(140, 50, 70), 3)
+local CoinsCard = CreateStatCard("Coins", "💰", Color3.fromRGB(230, 180, 60), Color3.fromRGB(180, 140, 40), 4)
 
--- Session Timer Panel
 local TimerPanel = Instance.new("Frame")
 TimerPanel.Name = "TimerPanel"
 TimerPanel.Size = UDim2.new(1, -40, 0, 85)
-TimerPanel.Position = UDim2.new(0, 20, 1, -105)
+TimerPanel.Position = UDim2.new(0, 20, 0, 660)
 TimerPanel.BackgroundColor3 = Color3.fromRGB(25, 25, 40)
 TimerPanel.BackgroundTransparency = 0.3
 TimerPanel.BorderSizePixel = 0
@@ -422,7 +398,6 @@ TimerValue.Font = Enum.Font.GothamBold
 TimerValue.TextXAlignment = Enum.TextXAlignment.Left
 TimerValue.Parent = TimerPanel
 
--- Kill Counter (ใหม่)
 local KillCounter = Instance.new("TextLabel")
 KillCounter.Name = "KillCounter"
 KillCounter.Size = UDim2.new(0, 200, 0, 25)
@@ -447,15 +422,71 @@ FoodCounter.Font = Enum.Font.GothamBold
 FoodCounter.TextXAlignment = Enum.TextXAlignment.Right
 FoodCounter.Parent = TimerPanel
 
--- ตัวแปรติดตามสถิติ
-local startTime = tick()
-local lastBacon = 0
-local lastMeat = 0
-local lastCoins = 0
-local rateUpdateInterval = 5 -- อัพเดทเรท ทุก 5 วินาที
+local FruitList = {
+    "Apple", "Banana", "Avacado", "Cherry", "Dragonfruit", "GoldenApple", 
+    "GoldenDragonfruit", "GoldenPear", "Grapes", "KajiFruit", "Lemon", 
+    "Lime", "Peach", "Pear", "Pineapple", "PricklyPear", "SunOrange", 
+    "Watermelon", "Blueberry", "Strawberry", "Almond", "Coconut", 
+    "CacaoBean", "JuniperBerry", "Aloe", "Lotus", "Edamame", "Broccoli",
+    "Chili", "Corn", "Onion", "Potato", "Carrot", "Pumpkin", "MistSudachi"
+}
 
--- Session Timer Animation
+local function GetTotalFruits()
+    local total = 0
+    pcall(function()
+        if not LocalPlayer:FindFirstChild("Data") then return end
+        local resources = LocalPlayer.Data:FindFirstChild("Resources")
+        if not resources then return end
+        
+        for _, fruitName in pairs(FruitList) do
+            local fruit = resources:FindFirstChild(fruitName)
+            if fruit and (fruit:IsA("NumberValue") or fruit:IsA("IntValue")) then
+                total = total + fruit.Value
+            end
+        end
+    end)
+    return total
+end
+
 local sessionStartTime = tick()
+local startTime = tick()
+local startFruit = 0
+local startBacon = 0
+local startMeat = 0
+local startCoins = 0
+
+local function WaitForData()
+    local maxWait = 10
+    local waited = 0
+    while waited < maxWait do
+        if LocalPlayer:FindFirstChild("Data") then
+            local data = LocalPlayer.Data
+            if data:FindFirstChild("Resources") and data:FindFirstChild("Currency") then
+                return true
+            end
+        end
+        wait(0.5)
+        waited = waited + 0.5
+    end
+    return false
+end
+
+spawn(function()
+    if not WaitForData() then
+        warn("Cannot load Data")
+        return
+    end
+    
+    wait(2)
+    
+    pcall(function()
+        startFruit = GetTotalFruits()
+        startBacon = LocalPlayer.Data.Resources.Bacon.Value or 0
+        startMeat = LocalPlayer.Data.Resources.Meat.Value or 0
+        startCoins = LocalPlayer.Data.Currency.Coins.Value or 0
+    end)
+end)
+
 spawn(function()
     while TimerValue.Parent do
         local elapsed = tick() - sessionStartTime
@@ -467,41 +498,52 @@ spawn(function()
     end
 end)
 
--- ฟังก์ชันอัพเดทค่า Stats พร้อมคำนวณอัตรา
 local function UpdateStats()
     pcall(function()
+        if not LocalPlayer:FindFirstChild("Data") then return end
+        if not LocalPlayer.Data:FindFirstChild("Resources") then return end
+        if not LocalPlayer.Data:FindFirstChild("Currency") then return end
+        
         local currentTime = tick()
         local elapsed = currentTime - startTime
         local hoursElapsed = elapsed / 3600
         
-        -- อัพเดท Bacon
-        local bacon = LocalPlayer.Data.Resources.Bacon.Value
+        local fruit = GetTotalFruits()
+        FruitCard.Value.Text = formatNumber(fruit)
+        
+        if hoursElapsed > 0 and elapsed > 10 then
+            local fruitGained = fruit - startFruit
+            local fruitRate = fruitGained / hoursElapsed
+            FruitCard.RateLabel.Text = "📈 +" .. formatNumber(math.floor(fruitRate)) .. "/hr"
+        end
+        
+        local bacon = LocalPlayer.Data.Resources.Bacon.Value or 0
         BaconCard.Value.Text = formatNumber(bacon)
         
-        if hoursElapsed > 0 then
-            local baconRate = (bacon - lastBacon) / hoursElapsed
+        if hoursElapsed > 0 and elapsed > 10 then
+            local baconGained = bacon - startBacon
+            local baconRate = baconGained / hoursElapsed
             BaconCard.RateLabel.Text = "📈 +" .. formatNumber(math.floor(baconRate)) .. "/hr"
         end
         
-        -- อัพเดท Meat
-        local meat = LocalPlayer.Data.Resources.Meat.Value
+        local meat = LocalPlayer.Data.Resources.Meat.Value or 0
         MeatCard.Value.Text = formatNumber(meat)
         
-        if hoursElapsed > 0 then
-            local meatRate = (meat - lastMeat) / hoursElapsed
+        if hoursElapsed > 0 and elapsed > 10 then
+            local meatGained = meat - startMeat
+            local meatRate = meatGained / hoursElapsed
             MeatCard.RateLabel.Text = "📈 +" .. formatNumber(math.floor(meatRate)) .. "/hr"
         end
         
-        -- อัพเดท Coins
-        local coins = LocalPlayer.Data.Currency.Coins.Value
+        local coins = LocalPlayer.Data.Currency.Coins.Value or 0
         CoinsCard.Value.Text = formatNumber(coins)
         
-        if hoursElapsed > 0 then
-            local coinRate = (coins - lastCoins) / hoursElapsed
+        if hoursElapsed > 0 and elapsed > 10 then
+            local coinsGained = coins - startCoins
+            local coinRate = coinsGained / hoursElapsed
             CoinsCard.RateLabel.Text = "📈 +" .. formatNumber(math.floor(coinRate)) .. "/hr"
         end
         
-        -- อัพเดท Progress สำหรับโหมด Hybrid (ถ้ามี Config)
         if getgenv().Config then
             local config = getgenv().Config
             
@@ -510,16 +552,14 @@ local function UpdateStats()
                 local fruitTarget = config.HybridSettings.FruitTarget
                 
                 local meatProgress = math.floor((meat / meatTarget) * 100)
-                local fruitProgress = math.floor((bacon / fruitTarget) * 100)
+                local fruitProgress = math.floor((fruit / fruitTarget) * 100)
                 
                 MeatCard.ProgressLabel.Text = "🎯 " .. math.min(meatProgress, 100) .. "% of " .. formatNumber(meatTarget)
-                BaconCard.ProgressLabel.Text = "🎯 " .. math.min(fruitProgress, 100) .. "% of " .. formatNumber(fruitTarget)
+                FruitCard.ProgressLabel.Text = "🎯 " .. math.min(fruitProgress, 100) .. "% of " .. formatNumber(fruitTarget)
             end
             
-            -- อัพเดท Farm Mode
             ModeValue.Text = config.FarmMode or "UNKNOWN"
             
-            -- อัพเดท Anti-Detection Status
             if config.AntiDetection and config.AntiDetection.Enabled then
                 AntiDetectStatus.Text = "🛡️ ANTI-DETECT: ON"
                 AntiDetectStatus.TextColor3 = Color3.fromRGB(0, 255, 150)
@@ -529,38 +569,23 @@ local function UpdateStats()
             end
         end
         
-        -- อัพเดท Kill/Food Counter (ถ้ามี FarmingStats)
-        if getgenv().FarmingStats or _G.FarmingStats then
-            local stats = getgenv().FarmingStats or _G.FarmingStats
-            if stats then
-                KillCounter.Text = "💀 Kills: " .. formatNumber(stats.MobsKilled or 0)
-                FoodCounter.Text = "🍎 Food: " .. formatNumber(stats.FoodCollected or 0)
-            end
+        if getgenv().FarmingStats then
+            local stats = getgenv().FarmingStats
+            KillCounter.Text = "💀 Kills: " .. formatNumber(stats.MobsKilled or 0)
+            FoodCounter.Text = "🍎 Food: " .. formatNumber(stats.FoodCollected or 0)
         end
     end)
 end
 
--- อัพเดท lastValues ทุก 5 วินาที
 spawn(function()
-    while ScreenGui.Parent do
-        wait(rateUpdateInterval)
-        pcall(function()
-            lastBacon = LocalPlayer.Data.Resources.Bacon.Value
-            lastMeat = LocalPlayer.Data.Resources.Meat.Value
-            lastCoins = LocalPlayer.Data.Currency.Coins.Value
-        end)
-    end
-end)
-
--- เรียกใช้ UpdateStats ทุกๆ 0.1 วินาที
-spawn(function()
+    wait(3)
+    
     while ScreenGui.Parent do
         UpdateStats()
-        wait(0.1)
+        wait(0.5)
     end
 end)
 
--- ทำให้ลากได้
 local dragging = false
 local dragInput, mousePos, framePos
 
@@ -596,7 +621,6 @@ game:GetService("UserInputService").InputChanged:Connect(function(input)
     end
 end)
 
--- ปุ่มซ่อน/แสดง UI (กด H)
 local isMinimized = false
 game:GetService("UserInputService").InputBegan:Connect(function(input, gameProcessed)
     if not gameProcessed and input.KeyCode == Enum.KeyCode.H then
@@ -617,7 +641,7 @@ game:GetService("UserInputService").InputBegan:Connect(function(input, gameProce
             Title.Text = "🐉 DRAGON FARM (Press H)"
         else
             TweenService:Create(MainFrame, TweenInfo.new(0.3, Enum.EasingStyle.Quad), {
-                Size = UDim2.new(0, 750, 0, 700),
+                Size = UDim2.new(0, 750, 0, 780),
                 BackgroundTransparency = 0.2
             }):Play()
             
@@ -632,294 +656,6 @@ game:GetService("UserInputService").InputBegan:Connect(function(input, gameProce
     end
 end)
 
--- ปุ่มควบคุมฟาร์ม (ใหม่)
-local ControlPanel = Instance.new("Frame")
-ControlPanel.Name = "ControlPanel"
-ControlPanel.Size = UDim2.new(1, -40, 0, 140)
-ControlPanel.Position = UDim2.new(0, 20, 0, 570)
-ControlPanel.BackgroundColor3 = Color3.fromRGB(25, 25, 40)
-ControlPanel.BackgroundTransparency = 0.3
-ControlPanel.BorderSizePixel = 0
-ControlPanel.Visible = false -- ซ่อนไว้ก่อน
-ControlPanel.Parent = MainFrame
-
-local controlCorner = Instance.new("UICorner")
-controlCorner.CornerRadius = UDim.new(0, 12)
-controlCorner.Parent = ControlPanel
-
-local controlStroke = Instance.new("UIStroke")
-controlStroke.Color = Color3.fromRGB(100, 200, 255)
-controlStroke.Thickness = 2
-controlStroke.Transparency = 0.7
-controlStroke.Parent = ControlPanel
-
--- ฟังก์ชันสร้างปุ่ม
-local function CreateButton(text, position, color, parent)
-    local button = Instance.new("TextButton")
-    button.Size = UDim2.new(0, 200, 0, 50)
-    button.Position = position
-    button.BackgroundColor3 = color
-    button.BackgroundTransparency = 0.3
-    button.BorderSizePixel = 0
-    button.Text = text
-    button.TextColor3 = Color3.fromRGB(255, 255, 255)
-    button.TextSize = 18
-    button.Font = Enum.Font.GothamBold
-    button.AutoButtonColor = false
-    button.Parent = parent
-    
-    local btnCorner = Instance.new("UICorner")
-    btnCorner.CornerRadius = UDim.new(0, 10)
-    btnCorner.Parent = button
-    
-    local btnStroke = Instance.new("UIStroke")
-    btnStroke.Color = Color3.fromRGB(255, 255, 255)
-    btnStroke.Thickness = 2
-    btnStroke.Transparency = 0.8
-    btnStroke.Parent = button
-    
-    -- Hover Effect
-    button.MouseEnter:Connect(function()
-        TweenService:Create(button, TweenInfo.new(0.2), {
-            BackgroundTransparency = 0.1
-        }):Play()
-        TweenService:Create(btnStroke, TweenInfo.new(0.2), {
-            Transparency = 0.5
-        }):Play()
-    end)
-    
-    button.MouseLeave:Connect(function()
-        TweenService:Create(button, TweenInfo.new(0.2), {
-            BackgroundTransparency = 0.3
-        }):Play()
-        TweenService:Create(btnStroke, TweenInfo.new(0.2), {
-            Transparency = 0.8
-        }):Play()
-    end)
-    
-    -- Click Effect
-    button.MouseButton1Click:Connect(function()
-        TweenService:Create(button, TweenInfo.new(0.1), {
-            Size = UDim2.new(0, 190, 0, 45)
-        }):Play()
-        wait(0.1)
-        TweenService:Create(button, TweenInfo.new(0.1), {
-            Size = UDim2.new(0, 200, 0, 50)
-        }):Play()
-    end)
-    
-    return button
-end
-
--- สร้างปุ่มควบคุม
-local StartFarmBtn = CreateButton("▶️ START FARM", UDim2.new(0, 20, 0, 20), Color3.fromRGB(50, 200, 100), ControlPanel)
-local StopFarmBtn = CreateButton("⏸️ STOP FARM", UDim2.new(0, 240, 0, 20), Color3.fromRGB(200, 50, 50), ControlPanel)
-local ShowStatsBtn = CreateButton("📊 SHOW STATS", UDim2.new(0, 460, 0, 20), Color3.fromRGB(100, 150, 255), ControlPanel)
-
-local ModeToggleBtn = CreateButton("🔄 HYBRID MODE", UDim2.new(0, 20, 0, 80), Color3.fromRGB(200, 150, 50), ControlPanel)
-local AntiDetectBtn = CreateButton("🛡️ ANTI-DETECT", UDim2.new(0, 240, 0, 80), Color3.fromRGB(150, 100, 200), ControlPanel)
-local SellBtn = CreateButton("💰 SELL ALL", UDim2.new(0, 460, 0, 80), Color3.fromRGB(230, 180, 60), ControlPanel)
-
--- เชื่อมต่อปุ่มกับฟังก์ชัน
-StartFarmBtn.MouseButton1Click:Connect(function()
-    pcall(function()
-        if _G.StartFarm then
-            _G.StartFarm()
-            StartFarmBtn.Text = "✅ FARMING..."
-            StartFarmBtn.BackgroundColor3 = Color3.fromRGB(100, 255, 100)
-            wait(2)
-            StartFarmBtn.Text = "▶️ START FARM"
-            StartFarmBtn.BackgroundColor3 = Color3.fromRGB(50, 200, 100)
-        end
-    end)
-end)
-
-StopFarmBtn.MouseButton1Click:Connect(function()
-    pcall(function()
-        if _G.StopFarm then
-            _G.StopFarm()
-            StopFarmBtn.Text = "✅ STOPPED"
-            StopFarmBtn.BackgroundColor3 = Color3.fromRGB(255, 100, 100)
-            wait(2)
-            StopFarmBtn.Text = "⏸️ STOP FARM"
-            StopFarmBtn.BackgroundColor3 = Color3.fromRGB(200, 50, 50)
-        end
-    end)
-end)
-
-ShowStatsBtn.MouseButton1Click:Connect(function()
-    pcall(function()
-        if _G.ShowFarmStats then
-            _G.ShowFarmStats()
-            ShowStatsBtn.Text = "✅ CHECK CONSOLE"
-            wait(2)
-            ShowStatsBtn.Text = "📊 SHOW STATS"
-        end
-    end)
-end)
-
-local currentModeIndex = 1
-local modes = {"Hybrid", "MobOnly", "FoodOnly"}
-local modeIcons = {
-    Hybrid = "🔄",
-    MobOnly = "💀",
-    FoodOnly = "🍎"
-}
-
-ModeToggleBtn.MouseButton1Click:Connect(function()
-    pcall(function()
-        currentModeIndex = currentModeIndex + 1
-        if currentModeIndex > #modes then
-            currentModeIndex = 1
-        end
-        
-        local newMode = modes[currentModeIndex]
-        
-        if _G.SwitchFarmMode then
-            _G.SwitchFarmMode(newMode)
-        end
-        
-        local icon = modeIcons[newMode] or "🔄"
-        ModeToggleBtn.Text = icon .. " " .. newMode:upper()
-        ModeValue.Text = newMode:upper()
-        
-        -- เปลี่ยนสี
-        if newMode == "Hybrid" then
-            ModeToggleBtn.BackgroundColor3 = Color3.fromRGB(200, 150, 50)
-        elseif newMode == "MobOnly" then
-            ModeToggleBtn.BackgroundColor3 = Color3.fromRGB(200, 50, 50)
-        else
-            ModeToggleBtn.BackgroundColor3 = Color3.fromRGB(50, 200, 100)
-        end
-    end)
-end)
-
-local antiDetectEnabled = true
-AntiDetectBtn.MouseButton1Click:Connect(function()
-    pcall(function()
-        antiDetectEnabled = not antiDetectEnabled
-        
-        if _G.ToggleAntiDetection then
-            _G.ToggleAntiDetection(antiDetectEnabled)
-        end
-        
-        if antiDetectEnabled then
-            AntiDetectBtn.Text = "🛡️ ANTI-DETECT"
-            AntiDetectBtn.BackgroundColor3 = Color3.fromRGB(150, 100, 200)
-            AntiDetectStatus.Text = "🛡️ ANTI-DETECT: ON"
-            AntiDetectStatus.TextColor3 = Color3.fromRGB(0, 255, 150)
-        else
-            AntiDetectBtn.Text = "⚠️ DETECT OFF"
-            AntiDetectBtn.BackgroundColor3 = Color3.fromRGB(100, 100, 100)
-            AntiDetectStatus.Text = "🛡️ ANTI-DETECT: OFF"
-            AntiDetectStatus.TextColor3 = Color3.fromRGB(255, 100, 100)
-        end
-    end)
-end)
-
-SellBtn.MouseButton1Click:Connect(function()
-    pcall(function()
-        SellBtn.Text = "💸 SELLING..."
-        SellBtn.BackgroundColor3 = Color3.fromRGB(255, 200, 50)
-        
-        -- เรียกฟังก์ชันขาย (ถ้ามี)
-        if getgenv().SellAllItems then
-            getgenv().SellAllItems()
-        end
-        
-        wait(3)
-        SellBtn.Text = "✅ SOLD!"
-        wait(2)
-        SellBtn.Text = "💰 SELL ALL"
-        SellBtn.BackgroundColor3 = Color3.fromRGB(230, 180, 60)
-    end)
-end)
-
--- ปุ่มแสดง/ซ่อน Control Panel (กด C)
-local controlPanelVisible = false
-game:GetService("UserInputService").InputBegan:Connect(function(input, gameProcessed)
-    if not gameProcessed and input.KeyCode == Enum.KeyCode.C then
-        controlPanelVisible = not controlPanelVisible
-        ControlPanel.Visible = controlPanelVisible
-        
-        if controlPanelVisible then
-            -- ขยาย MainFrame
-            TweenService:Create(MainFrame, TweenInfo.new(0.3, Enum.EasingStyle.Quad), {
-                Size = UDim2.new(0, 750, 0, 870)
-            }):Play()
-        else
-            -- ย่อ MainFrame
-            TweenService:Create(MainFrame, TweenInfo.new(0.3, Enum.EasingStyle.Quad), {
-                Size = UDim2.new(0, 750, 0, 700)
-            }):Play()
-        end
-    end
-end)
-
--- แสดงข้อความช่วยเหลือเมื่อเริ่มต้น
-spawn(function()
-    wait(2)
-    
-    local HelpNotification = Instance.new("Frame")
-    HelpNotification.Name = "HelpNotif"
-    HelpNotification.Size = UDim2.new(0, 400, 0, 100)
-    HelpNotification.Position = UDim2.new(0.5, -200, 1, 50)
-    HelpNotification.BackgroundColor3 = Color3.fromRGB(30, 30, 50)
-    HelpNotification.BackgroundTransparency = 0.2
-    HelpNotification.BorderSizePixel = 0
-    HelpNotification.ZIndex = 999999999
-    HelpNotification.Parent = ScreenGui
-    
-    local helpCorner = Instance.new("UICorner")
-    helpCorner.CornerRadius = UDim.new(0, 15)
-    helpCorner.Parent = HelpNotification
-    
-    local helpStroke = Instance.new("UIStroke")
-    helpStroke.Color = Color3.fromRGB(100, 200, 255)
-    helpStroke.Thickness = 3
-    helpStroke.Transparency = 0.5
-    helpStroke.Parent = HelpNotification
-    
-    local HelpTitle = Instance.new("TextLabel")
-    HelpTitle.Size = UDim2.new(1, -20, 0, 30)
-    HelpTitle.Position = UDim2.new(0, 10, 0, 10)
-    HelpTitle.BackgroundTransparency = 1
-    HelpTitle.Text = "⌨️ HOTKEYS"
-    HelpTitle.TextColor3 = Color3.fromRGB(100, 200, 255)
-    HelpTitle.TextSize = 20
-    HelpTitle.Font = Enum.Font.GothamBold
-    HelpTitle.TextXAlignment = Enum.TextXAlignment.Left
-    HelpTitle.Parent = HelpNotification
-    
-    local HelpText = Instance.new("TextLabel")
-    HelpText.Size = UDim2.new(1, -20, 0, 50)
-    HelpText.Position = UDim2.new(0, 10, 0, 40)
-    HelpText.BackgroundTransparency = 1
-    HelpText.Text = "Press [H] to Hide/Show UI\nPress [C] to Show/Hide Controls"
-    HelpText.TextColor3 = Color3.fromRGB(255, 255, 255)
-    HelpText.TextSize = 16
-    HelpText.Font = Enum.Font.Gotham
-    HelpText.TextXAlignment = Enum.TextXAlignment.Left
-    HelpText.TextYAlignment = Enum.TextYAlignment.Top
-    HelpText.Parent = HelpNotification
-    
-    -- Slide in
-    TweenService:Create(HelpNotification, TweenInfo.new(0.5, Enum.EasingStyle.Back), {
-        Position = UDim2.new(0.5, -200, 1, -120)
-    }):Play()
-    
-    -- Auto hide after 5 seconds
-    wait(5)
-    TweenService:Create(HelpNotification, TweenInfo.new(0.5, Enum.EasingStyle.Quad), {
-        Position = UDim2.new(0.5, -200, 1, 50),
-        BackgroundTransparency = 1
-    }):Play()
-    
-    wait(0.5)
-    HelpNotification:Destroy()
-end)
-
--- Notification System
 local function ShowNotification(title, message, duration, color)
     local notif = Instance.new("Frame")
     notif.Size = UDim2.new(0, 350, 0, 80)
@@ -964,12 +700,10 @@ local function ShowNotification(title, message, duration, color)
     notifMsg.TextWrapped = true
     notifMsg.Parent = notif
     
-    -- Slide in
     TweenService:Create(notif, TweenInfo.new(0.4, Enum.EasingStyle.Back), {
         Position = UDim2.new(1, -370, 0, 100)
     }):Play()
     
-    -- Auto remove
     spawn(function()
         wait(duration or 3)
         TweenService:Create(notif, TweenInfo.new(0.4, Enum.EasingStyle.Quad), {
@@ -981,26 +715,69 @@ local function ShowNotification(title, message, duration, color)
     end)
 end
 
--- Export notification function
 _G.ShowNotification = ShowNotification
 
--- เมื่อเริ่มต้น
-ShowNotification("🐉 DRAGON FARM PRO", "UI Loaded Successfully!\nPress H or C for controls", 4, Color3.fromRGB(50, 150, 255))
+spawn(function()
+    wait(2)
+    
+    local HelpNotification = Instance.new("Frame")
+    HelpNotification.Name = "HelpNotif"
+    HelpNotification.Size = UDim2.new(0, 400, 0, 120)
+    HelpNotification.Position = UDim2.new(0.5, -200, 1, 50)
+    HelpNotification.BackgroundColor3 = Color3.fromRGB(30, 30, 50)
+    HelpNotification.BackgroundTransparency = 0.2
+    HelpNotification.BorderSizePixel = 0
+    HelpNotification.ZIndex = 999999999
+    HelpNotification.Parent = ScreenGui
+    
+    local helpCorner = Instance.new("UICorner")
+    helpCorner.CornerRadius = UDim.new(0, 15)
+    helpCorner.Parent = HelpNotification
+    
+    local helpStroke = Instance.new("UIStroke")
+    helpStroke.Color = Color3.fromRGB(100, 200, 255)
+    helpStroke.Thickness = 3
+    helpStroke.Transparency = 0.5
+    helpStroke.Parent = HelpNotification
+    
+    local HelpTitle = Instance.new("TextLabel")
+    HelpTitle.Size = UDim2.new(1, -20, 0, 30)
+    HelpTitle.Position = UDim2.new(0, 10, 0, 10)
+    HelpTitle.BackgroundTransparency = 1
+    HelpTitle.Text = "⌨️ CONTROLS"
+    HelpTitle.TextColor3 = Color3.fromRGB(100, 200, 255)
+    HelpTitle.TextSize = 20
+    HelpTitle.Font = Enum.Font.GothamBold
+    HelpTitle.TextXAlignment = Enum.TextXAlignment.Left
+    HelpTitle.Parent = HelpNotification
+    
+    local HelpText = Instance.new("TextLabel")
+    HelpText.Size = UDim2.new(1, -20, 0, 70)
+    HelpText.Position = UDim2.new(0, 10, 0, 40)
+    HelpText.BackgroundTransparency = 1
+    HelpText.Text = "Press [H] to Hide/Show UI\n\n_G.StartFarm() - Start Farming\n_G.StopFarm() - Stop Farming\n_G.ShowFarmStats() - Show Stats"
+    HelpText.TextColor3 = Color3.fromRGB(255, 255, 255)
+    HelpText.TextSize = 14
+    HelpText.Font = Enum.Font.Gotham
+    HelpText.TextXAlignment = Enum.TextXAlignment.Left
+    HelpText.TextYAlignment = Enum.TextYAlignment.Top
+    HelpText.Parent = HelpNotification
+    
+    TweenService:Create(HelpNotification, TweenInfo.new(0.5, Enum.EasingStyle.Back), {
+        Position = UDim2.new(0.5, -200, 1, -140)
+    }):Play()
+    
+    wait(6)
+    TweenService:Create(HelpNotification, TweenInfo.new(0.5, Enum.EasingStyle.Quad), {
+        Position = UDim2.new(0.5, -200, 1, 50),
+        BackgroundTransparency = 1
+    }):Play()
+    
+    wait(0.5)
+    HelpNotification:Destroy()
+end)
 
-print("====================================")
-print("🐉 DRAGON FARM PRO UI - LOADED")
-print("====================================")
-print("⌨️  Hotkeys:")
-print("   [H] - Hide/Show UI")
-print("   [C] - Show/Hide Control Panel")
-print("====================================")
-print("📊 Features:")
-print("   • Real-time Stats Tracking")
-print("   • Farm Rate Calculator")
-print("   • Kill & Food Counter")
-print("   • Hybrid Mode Progress")
-print("   • Quick Control Buttons")
-print("====================================")
+ShowNotification("🐉 DRAGON FARM PRO", "UI Loaded Successfully!\nStats tracking active", 4, Color3.fromRGB(50, 150, 255))
 
 return {
     ScreenGui = ScreenGui,
